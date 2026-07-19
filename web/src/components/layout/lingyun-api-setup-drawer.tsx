@@ -3,7 +3,7 @@ import { ExternalLink, DollarSign } from "lucide-react";
 import { useState } from "react";
 
 import { fetchChannelModels } from "@/services/api/image";
-import { fetchLingyunPricing, type LingyunPricingItem } from "@/services/lingyun-pricing";
+import { fetchLingyunPricing, type LingyunPricingItem, type LingyunPricingResult } from "@/services/lingyun-pricing";
 import { createModelChannel, guessCapability, type ModelChannel } from "@/stores/use-config-store";
 
 const LINGYUN_BASE_URL = "https://image.lingyunapi.com";
@@ -15,15 +15,15 @@ const LINGYUN_LINKS = [
 
 function PricingModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     const { message } = App.useApp();
-    const [data, setData] = useState<LingyunPricingItem[]>([]);
+    const [result, setResult] = useState<LingyunPricingResult>({ data: [], group_ratio: {} });
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
 
     const load = async () => {
-        if (data.length) return;
+        if (result.data.length) return;
         setLoading(true);
         try {
-            setData(await fetchLingyunPricing());
+            setResult(await fetchLingyunPricing());
         } catch (error) {
             message.error(error instanceof Error ? error.message : "获取价格失败");
         } finally {
@@ -31,7 +31,8 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
         }
     };
 
-    const imageModels = data.filter((item) => (item.tags ?? "").includes("画图"));
+    const groupRatio = result.group_ratio["画图分组"] ?? 1;
+    const imageModels = result.data.filter((item) => item.enable_groups.includes("画图分组"));
     const visible = search.trim()
         ? imageModels.filter((item) => item.model_name.toLowerCase().includes(search.toLowerCase()))
         : imageModels;
@@ -49,7 +50,7 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
             key: "price",
             width: 130,
             render: (_: unknown, row: LingyunPricingItem) => (
-                <span className="font-mono text-xs">&yen;{row.model_price}</span>
+                <span className="font-mono text-xs">&yen;{(row.model_price * groupRatio).toFixed(4).replace(/\.?0+$/, "")}</span>
             ),
         },
         {

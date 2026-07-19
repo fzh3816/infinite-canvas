@@ -11,9 +11,17 @@ export type LingyunPricingItem = {
     supported_endpoint_types: string[];
 };
 
-export async function fetchLingyunPricing(): Promise<LingyunPricingItem[]> {
+export type LingyunPricingResult = {
+    data: LingyunPricingItem[];
+    group_ratio: Record<string, number>;
+};
+
+export async function fetchLingyunPricing(): Promise<LingyunPricingResult> {
     const response = await fetch("/proxy/lingyun-pricing");
     if (!response.ok) throw new Error(`获取价格失败：${response.statusText}`);
-    const json = (await response.json()) as { data?: LingyunPricingItem[] };
-    return json.data ?? [];
+    const json = (await response.json()) as { data?: LingyunPricingItem[]; group_ratio?: Record<string, number> };
+    return {
+        data: json.data ?? [],
+        group_ratio: json.group_ratio ?? {},
+    };
 }
