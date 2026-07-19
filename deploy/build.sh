@@ -10,9 +10,9 @@ if [[ "${1:-}" == "--pull" ]]; then
   git pull origin prod
 fi
 
-if docker compose ps -q app 2>/dev/null | grep -q .; then
+if docker compose ps -q infinite-canvas 2>/dev/null | grep -q .; then
   echo "[deploy] 停止旧容器..."
-  docker compose stop app
+  docker compose stop infinite-canvas
 fi
 
 echo "[deploy] 构建镜像..."
