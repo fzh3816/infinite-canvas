@@ -57,8 +57,8 @@ export default function IndexPage() {
                         <Button type="primary" size="large" onClick={() => navigate(`/${primaryTool.slug}`)} icon={<ArrowRight className="size-4" />} iconPlacement="end">
                             开始使用
                         </Button>
-                        <Button size="large" onClick={() => navigate("/canvas")}>
-                            打开画布
+                        <Button type="primary" size="large" onClick={() => window.open("https://b2wm53yf7h.apifox.cn/9200514m0", "_blank")} icon={<ArrowRight className="size-4" />} iconPlacement="end">
+                            使用教程
                         </Button>
                     </div>
                 </div>
