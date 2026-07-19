@@ -12,7 +12,7 @@ export type LingyunPricingItem = {
 };
 
 export async function fetchLingyunPricing(): Promise<LingyunPricingItem[]> {
-    const response = await fetch("https://www.lingyunapi.com/api/pricing");
+    const response = await fetch("/proxy/lingyun-pricing");
     if (!response.ok) throw new Error(`获取价格失败：${response.statusText}`);
     const json = (await response.json()) as { data?: LingyunPricingItem[] };
     return json.data ?? [];
