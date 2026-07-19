@@ -9,8 +9,8 @@ import { createModelChannel, guessCapability, type ModelChannel } from "@/stores
 const LINGYUN_BASE_URL = "https://image.lingyunapi.com";
 
 const LINGYUN_LINKS = [
-    { label: "密钥获取教程", url: "" },
-    { label: "使用教程", url: "" },
+    { label: "密钥获取教程", url: "https://b2wm53yf7h.apifox.cn/9200514m0" },
+    { label: "使用教程", url: "https://b2wm53yf7h.apifox.cn/9200514m0" },
 ];
 
 
