@@ -11,11 +11,12 @@ export const navigationTools = [
         label: "生图工作台",
         icon: ImagePlus,
     },
-    {
-        slug: "video",
-        label: "视频创作台",
-        icon: Video,
-    },
+    // 去掉视频创作台导航
+    // {
+    //     slug: "video",
+    //     label: "视频创作台",
+    //     icon: Video,
+    // },
     {
         slug: "prompts",
         label: "提示词库",

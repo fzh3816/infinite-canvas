@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ModelPicker } from "@/components/model-picker";
 import { ChannelEditorDrawer } from "@/components/layout/channel-editor-drawer";
 import { ConfigPromptSources } from "@/components/layout/config-prompt-sources";
+import { LingyunApiSetupDrawer } from "@/components/layout/lingyun-api-setup-drawer";
 import { syncAppDataToWebdav, type AppSyncDomainKey, type AppSyncProgressEvent } from "@/services/app-sync";
 import { testWebdavConnection, WEBDAV_MANIFEST_FILE_NAME } from "@/services/webdav-sync";
 import { audioFormatOptions, audioVoiceOptions, normalizeAudioSpeedValue } from "@/lib/audio-generation";
@@ -53,6 +54,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     const { message } = App.useApp();
     const [activeTab, setActiveTab] = useState<ConfigTabKey>(initialTab);
     const [editingChannelId, setEditingChannelId] = useState("");
+    const [lingyunSetupOpen, setLingyunSetupOpen] = useState(false);
     const [testingWebdav, setTestingWebdav] = useState(false);
     const [syncingWebdav, setSyncingWebdav] = useState(false);
     const [webdavSyncStatus, setWebdavSyncStatus] = useState("");
@@ -81,6 +83,23 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     };
 
     const updateChannels = (channels: ModelChannel[]) => saveConfig(withChannels(config, channels));
+
+    const setupLingyunChannels = (incoming: ModelChannel[]) => {
+        let added = 0, updated = 0;
+        const merged = [...config.channels];
+        for (const ch of incoming) {
+            const idx = merged.findIndex((c) => c.name === ch.name);
+            if (idx >= 0) {
+                merged[idx] = { ...merged[idx], apiKey: ch.apiKey, models: ch.models };
+                updated++;
+            } else {
+                merged.push(ch);
+                added++;
+            }
+        }
+        updateChannels(merged);
+        return { added, updated };
+    };
 
     const addChannel = () => {
         const channel = createModelChannel({ name: `渠道 ${config.channels.length + 1}` });
@@ -164,9 +183,12 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                             <div>
                                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                                     <div className="text-xs text-stone-500">每个渠道选择一个协议并拉取模型，为每个模型指定能力（生图/视频/文本/音频），并可自定义调用脚本。</div>
-                                    <Button type="primary" icon={<Plus className="size-4" />} onClick={addChannel}>
-                                        新增渠道
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button style={{ background: "linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)", borderColor: "transparent", color: "#fff", fontWeight: 500 }} onClick={() => setLingyunSetupOpen(true)}>一键配置灵云 API 渠道</Button>
+                                        <Button type="primary" icon={<Plus className="size-4" />} onClick={addChannel}>
+                                            新增渠道
+                                        </Button>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     {config.channels.map((channel) => (
@@ -299,6 +321,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                     </Button>
                 </div>
             ) : null}
+            <LingyunApiSetupDrawer open={lingyunSetupOpen} onSetup={setupLingyunChannels} onClose={() => setLingyunSetupOpen(false)} />
             <ChannelEditorDrawer open={Boolean(editingChannel)} channel={editingChannel} onSave={saveChannel} onClose={() => setEditingChannelId("")} />
         </>
     );
