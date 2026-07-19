@@ -13,7 +13,6 @@ const LINGYUN_LINKS = [
     { label: "使用教程", url: "https://b2wm53yf7h.apifox.cn/9200522m0" },
 ];
 
-
 function PricingModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     const { message } = App.useApp();
     const [data, setData] = useState<LingyunPricingItem[]>([]);
@@ -50,7 +49,7 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
             key: "price",
             width: 130,
             render: (_: unknown, row: LingyunPricingItem) => (
-                <span className="font-mono text-xs">¥{row.model_price}</span>
+                <span className="font-mono text-xs">&yen;{row.model_price}</span>
             ),
         },
         {
@@ -72,7 +71,7 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
             styles={{ body: { maxHeight: "68vh", overflowY: "auto" } }}
         >
             <div className="mb-3">
-                <Input.Search placeholder="搜索模型名称或标签…" value={search} onChange={(e) => setSearch(e.target.value)} allowClear />
+                <Input.Search placeholder="搜索模型名称…" value={search} onChange={(e) => setSearch(e.target.value)} allowClear />
             </div>
             <Spin spinning={loading}>
                 <Table
@@ -105,11 +104,6 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
             message.error("请输入灵云API 画图分组密钥【生图】");
             return;
         }
-        if (!codexKey.trim()) {
-            message.error("请输入灵云API CodeX专属模型密钥【文本润色】");
-            return;
-        }
-
         setLoading(true);
         try {
             const imageChannelTemp = createModelChannel({ baseUrl: LINGYUN_BASE_URL, apiKey: imageKey.trim(), apiFormat: "openai" });
@@ -121,8 +115,9 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
                 return lower.includes("gpt-image") || lower.includes("dall-e") || lower.includes("imagen") || lower.includes("flux");
             });
 
-            const textChannelTemp = createModelChannel({ baseUrl: LINGYUN_BASE_URL, apiKey: codexKey.trim(), apiFormat: "openai" });
-            const allTextModelNames = (await fetchChannelModels(textChannelTemp)).filter((n) => guessCapability(n) === "text");
+            const allTextModelNames = codexKey.trim()
+                ? (await fetchChannelModels(createModelChannel({ baseUrl: LINGYUN_BASE_URL, apiKey: codexKey.trim(), apiFormat: "openai" }))).filter((n) => guessCapability(n) === "text")
+                : [];
 
             const newChannels: ModelChannel[] = [];
 
@@ -132,7 +127,7 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
                         name: "lingyun-gemini生图",
                         baseUrl: LINGYUN_BASE_URL,
                         apiKey: imageKey.trim(),
-                        apiFormat: "openai",
+                        apiFormat: "gemini",
                         models: geminiNames.map((n) => ({ name: n, capability: "image" as const })),
                     }),
                 );
@@ -185,7 +180,7 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
                         {LINGYUN_LINKS.map((link) => (
                             <a
                                 key={link.label}
-                                href={link.url || "#"}
+                                href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
@@ -199,14 +194,14 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
                             className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
                         >
                             <DollarSign className="size-3.5" />
-                            模型价格
+                            {"模型价格"}
                         </button>
                     </div>
                     <Form layout="vertical" requiredMark={false}>
                         <Form.Item label="生图模型密钥" extra="用于创建 Gemini 生图和 GPT 生图两个渠道" className="mb-4">
                             <Input.Password value={imageKey} onChange={(e) => setImageKey(e.target.value)} placeholder="sk-..." autoComplete="off" />
                         </Form.Item>
-                        <Form.Item label="Codex 对话模型密钥" extra="用于创建文本对话渠道" className="mb-4">
+                        <Form.Item label="Codex 对话模型密钥（选填）" extra="用于创建文本对话渠道，不填则跳过" className="mb-4">
                             <Input.Password value={codexKey} onChange={(e) => setCodexKey(e.target.value)} placeholder="sk-..." autoComplete="off" />
                         </Form.Item>
                         <Button type="primary" block loading={loading} onClick={() => void handleConfirm()}>
