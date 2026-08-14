@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { fetchPrompts, type Prompt } from "@/services/api/prompts";
 import { navigationTools } from "@/constant/navigation-tools";
+import { presetApiProvider } from "@/lib/preset-api-provider";
 import { cn } from "@/lib/utils";
 
 function Highlighter({ action, color, children }: { action: "highlight" | "underline"; color: string; children: ReactNode }) {
@@ -57,7 +58,7 @@ export default function IndexPage() {
                         <Button type="primary" size="large" onClick={() => navigate(`/${primaryTool.slug}`)} icon={<ArrowRight className="size-4" />} iconPlacement="end">
                             开始使用
                         </Button>
-                        <Button type="primary" size="large" onClick={() => window.open("https://b2wm53yf7h.apifox.cn/9200514m0", "_blank")} icon={<ArrowRight className="size-4" />} iconPlacement="end">
+                        <Button type="primary" size="large" onClick={() => window.open(presetApiProvider.usageGuideUrl, "_blank", "noopener,noreferrer")} icon={<ArrowRight className="size-4" />} iconPlacement="end">
                             使用教程
                         </Button>
                     </div>

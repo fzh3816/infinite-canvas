@@ -3,19 +3,18 @@ import { ExternalLink, DollarSign } from "lucide-react";
 import { useState } from "react";
 
 import { fetchChannelModels } from "@/services/api/image";
-import { fetchLingyunPricing, type LingyunPricingItem, type LingyunPricingResult } from "@/services/lingyun-pricing";
+import { fetchProviderPricing, type ProviderPricingItem, type ProviderPricingResult } from "@/services/api/provider-pricing";
+import { presetApiProvider } from "@/lib/preset-api-provider";
 import { createModelChannel, guessCapability, type ModelChannel } from "@/stores/use-config-store";
 
-const LINGYUN_BASE_URL = "https://image.lingyunapi.com";
-
-const LINGYUN_LINKS = [
-    { label: "配置教程", url: "https://b2wm53yf7h.apifox.cn/9200514m0" },
-    { label: "使用教程", url: "https://b2wm53yf7h.apifox.cn/9200522m0" },
+const guideLinks = [
+    { label: "配置教程", url: presetApiProvider.setupGuideUrl },
+    { label: "使用教程", url: presetApiProvider.usageGuideUrl },
 ];
 
 function PricingModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     const { message } = App.useApp();
-    const [result, setResult] = useState<LingyunPricingResult>({ data: [], group_ratio: {} });
+    const [result, setResult] = useState<ProviderPricingResult>({ data: [], group_ratio: {} });
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
 
@@ -23,7 +22,7 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
         if (result.data.length) return;
         setLoading(true);
         try {
-            setResult(await fetchLingyunPricing());
+            setResult(await fetchProviderPricing(presetApiProvider.pricingUrl));
         } catch (error) {
             message.error(error instanceof Error ? error.message : "获取价格失败");
         } finally {
@@ -49,7 +48,7 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
             title: "价格（元/次）",
             key: "price",
             width: 130,
-            render: (_: unknown, row: LingyunPricingItem) => (
+            render: (_: unknown, row: ProviderPricingItem) => (
                 <span className="font-mono text-xs">&yen;{(row.model_price * groupRatio).toFixed(4).replace(/\.?0+$/, "")}</span>
             ),
         },
@@ -63,7 +62,7 @@ function PricingModal({ open, onClose }: { open: boolean; onClose: () => void })
 
     return (
         <Modal
-            title="灵云 API 生图模型价格"
+            title={`${presetApiProvider.name} API 生图模型价格`}
             open={open}
             width={860}
             onCancel={onClose}
@@ -102,12 +101,12 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
 
     const handleConfirm = async () => {
         if (!imageKey.trim()) {
-            message.error("请输入灵云API 画图分组密钥【生图】");
+            message.error(`请输入${presetApiProvider.name} API 画图分组密钥【生图】`);
             return;
         }
         setLoading(true);
         try {
-            const imageChannelTemp = createModelChannel({ baseUrl: LINGYUN_BASE_URL, apiKey: imageKey.trim(), apiFormat: "openai" });
+            const imageChannelTemp = createModelChannel({ baseUrl: presetApiProvider.baseUrl, apiKey: imageKey.trim(), apiFormat: "openai" });
             const allImageModelNames = await fetchChannelModels(imageChannelTemp);
 
             const geminiNames = allImageModelNames.filter((n) => n.toLowerCase().includes("gemini"));
@@ -117,7 +116,7 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
             });
 
             const allTextModelNames = codexKey.trim()
-                ? (await fetchChannelModels(createModelChannel({ baseUrl: LINGYUN_BASE_URL, apiKey: codexKey.trim(), apiFormat: "openai" }))).filter((n) => guessCapability(n) === "text")
+                ? (await fetchChannelModels(createModelChannel({ baseUrl: presetApiProvider.baseUrl, apiKey: codexKey.trim(), apiFormat: "openai" }))).filter((n) => guessCapability(n) === "text" && !n.toLowerCase().includes("image"))
                 : [];
 
             const newChannels: ModelChannel[] = [];
@@ -125,8 +124,8 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
             if (geminiNames.length) {
                 newChannels.push(
                     createModelChannel({
-                        name: "lingyun-gemini生图",
-                        baseUrl: LINGYUN_BASE_URL,
+                        name: `${presetApiProvider.channelPrefix}-gemini生图`,
+                        baseUrl: presetApiProvider.baseUrl,
                         apiKey: imageKey.trim(),
                         apiFormat: "gemini",
                         models: geminiNames.map((n) => ({ name: n, capability: "image" as const })),
@@ -137,8 +136,8 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
             if (gptImageNames.length) {
                 newChannels.push(
                     createModelChannel({
-                        name: "lingyun-gpt生图",
-                        baseUrl: LINGYUN_BASE_URL,
+                        name: `${presetApiProvider.channelPrefix}-gpt生图`,
+                        baseUrl: presetApiProvider.baseUrl,
                         apiKey: imageKey.trim(),
                         apiFormat: "openai",
                         models: gptImageNames.map((n) => ({ name: n, capability: "image" as const })),
@@ -149,8 +148,8 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
             if (allTextModelNames.length) {
                 newChannels.push(
                     createModelChannel({
-                        name: "lingyun-codex文本",
-                        baseUrl: LINGYUN_BASE_URL,
+                        name: `${presetApiProvider.channelPrefix}-codex文本`,
+                        baseUrl: presetApiProvider.baseUrl,
                         apiKey: codexKey.trim(),
                         apiFormat: "openai",
                         models: allTextModelNames.map((n) => ({ name: n, capability: "text" as const })),
@@ -175,10 +174,10 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
 
     return (
         <>
-            <Drawer open={open} width={480} title="一键配置灵云 API 渠道" onClose={handleClose} footer={null}>
+            <Drawer open={open} width={480} title={`一键配置${presetApiProvider.name} API 渠道`} onClose={handleClose} footer={null}>
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-wrap gap-3">
-                        {LINGYUN_LINKS.map((link) => (
+                        {guideLinks.map((link) => (
                             <a
                                 key={link.label}
                                 href={link.url}

@@ -1,0 +1,217 @@
+schema: comet.native.v4
+name: filter-image-models
+language: zh-CN
+phase: verify
+status: active
+state_version: 4
+brief: brief.md
+spec_changes:
+  - capability: api-provider-config
+    operation: modify
+    source: specs/api-provider-config/spec.md
+workspace:
+  isolation: current
+  change_branch: prod
+  target_branch: prod
+  finish: null
+loop:
+  stage: verify-ready
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: await-verifier-result
+acceptance:
+  - id: A1
+    source: brief.md
+    text: A1：文本密钥返回 `gpt-image-1`、`IMAGE-preview` 等名称包含 `image`
+      的模型时，这些模型不会进入新建或更新的文本渠道。
+    result: pending
+    reason: null
+  - id: A2
+    source: brief.md
+    text: A2：文本密钥返回名称不包含 `image` 且被识别为文本能力的模型时，这些模型仍正常进入文本渠道。
+    result: pending
+    reason: null
+  - id: A3
+    source: brief.md
+    text: A3：画图密钥获取及 Gemini、GPT 生图渠道的创建流程保持不变。
+    result: pending
+    reason: null
+  - id: A4
+    source: specs/api-provider-config/spec.md
+    text: 系统必须在 `web/src/lib/preset-api-provider.ts` 中维护 Lingyun 与 Nuona
+      的完整配置对象。每个对象必须包含域名匹配信息、提供方标识与名称、渠道前缀、模型 API 地址、价格代理路径、配置教程地址、使用教程地址和文档地址。
+    result: pending
+    reason: null
+  - id: A5
+    source: specs/api-provider-config/spec.md
+    text: 系统必须只在该模块中根据当前访问域名选择配置。域名包含 `nuona.vin` 时选择 Nuona，包含 `lingyunapi.com` 时选择
+      Lingyun；其他域名默认选择 Lingyun。
+    result: pending
+    reason: null
+  - id: A6
+    source: specs/api-provider-config/spec.md
+    text: 模型 API：`https://image.lingyunapi.com`
+    result: pending
+    reason: null
+  - id: A7
+    source: specs/api-provider-config/spec.md
+    text: 配置教程：`https://b2wm53yf7h.apifox.cn/9200514m0`
+    result: pending
+    reason: null
+  - id: A8
+    source: specs/api-provider-config/spec.md
+    text: 使用教程：`https://b2wm53yf7h.apifox.cn/9200522m0`
+    result: pending
+    reason: null
+  - id: A9
+    source: specs/api-provider-config/spec.md
+    text: 文档：`https://b2wm53yf7h.apifox.cn/9200514m0`
+    result: pending
+    reason: null
+  - id: A10
+    source: specs/api-provider-config/spec.md
+    text: 价格代理：`/proxy/lingyun-pricing`
+    result: pending
+    reason: null
+  - id: A11
+    source: specs/api-provider-config/spec.md
+    text: 模型 API：`https://api.nuona.vin`
+    result: pending
+    reason: null
+  - id: A12
+    source: specs/api-provider-config/spec.md
+    text: 配置教程：`https://aaa.com`
+    result: pending
+    reason: null
+  - id: A13
+    source: specs/api-provider-config/spec.md
+    text: 使用教程：`https://aaa.com`
+    result: pending
+    reason: null
+  - id: A14
+    source: specs/api-provider-config/spec.md
+    text: 文档：`https://aaa.com`
+    result: pending
+    reason: null
+  - id: A15
+    source: specs/api-provider-config/spec.md
+    text: 价格代理：`/proxy/nuona-pricing`
+    result: pending
+    reason: null
+  - id: A16
+    source: specs/api-provider-config/spec.md
+    text: 一键渠道配置获取文本密钥对应的模型后，必须只保留能力被识别为文本且模型名称不包含 `image` 的模型。`image`
+      匹配必须不区分大小写，过滤后的模型才能用于创建或更新文本渠道。
+    result: pending
+    reason: null
+  - id: A17
+    source: specs/api-provider-config/spec.md
+    text: 画图密钥对应的模型获取、Gemini 生图渠道和 GPT 生图渠道的筛选与创建流程保持不变。
+    result: pending
+    reason: null
+  - id: A18
+    source: specs/api-provider-config/spec.md
+    text: 该过滤必须只在新增的一键渠道配置代码中实现，不得修改画布组件、画布状态、通用模型能力推断或其他画布原有源码逻辑。
+    result: pending
+    reason: null
+  - id: A19
+    source: specs/api-provider-config/spec.md
+    text: 一键渠道配置入口与抽屉必须从所选配置读取品牌、渠道前缀、模型地址及教程地址。首页使用教程必须读取
+      `usageGuideUrl`。全局文档入口必须读取 `docsUrl`。价格服务必须接收所选配置的 `pricingUrl`。
+    result: pending
+    reason: null
+  - id: A20
+    source: specs/api-provider-config/spec.md
+    text: Nginx 必须为两个价格代理路径配置固定上游，不再根据访问域名选择容器。
+    result: pending
+    reason: null
+builder_handoff:
+  candidate_id: f4ba337c-2b66-4c39-b6d0-02e4be35f488
+  identity_provider: skill-coordinated
+  builder_execution_ref: skill-coordinated:builder:bd5012bb-3f4b-4a75-b76d-3753e1919e68
+  iteration: 1
+  summary:
+    text: 在新增的一键 API 配置抽屉中为文本模型列表追加不区分大小写的 image
+      名称过滤；保持文本能力判断、生图渠道和画布原有逻辑不变，并同步待测试记录与变更日志。
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A5
+    - A6
+    - A7
+    - A8
+    - A9
+    - A10
+    - A11
+    - A12
+    - A13
+    - A14
+    - A15
+    - A16
+    - A17
+    - A18
+    - A19
+    - A20
+  checks:
+    - name:
+        text: 文本模型过滤静态核对
+        truncated: false
+      result: passed
+      note:
+        text: 文本模型同时要求 guessCapability 为 text，且模型名转小写后不包含 image。
+        truncated: false
+    - name:
+        text: 生图与画布逻辑边界核对
+        truncated: false
+      result: passed
+      note:
+        text: Gemini/GPT 生图渠道块未修改，画布组件、页面、状态与工具目录没有本次差异。
+        truncated: false
+    - name:
+        text: 提供方配置基线核对
+        truncated: false
+      result: passed
+      note:
+        text: Lingyun/Nuona 域名、API、教程、文档、价格路径及消费方仍符合现有完整规格。
+        truncated: false
+    - name:
+        text: 构建、测试与语法检查
+        truncated: false
+      result: not-run
+      note:
+        text: 项目 AGENTS.md 明确要求完成代码后不执行构建、测试或语法检查。
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: 未实际请求模型接口验证返回列表，需由用户在对应域名和密钥环境中测试。
+      truncated: false
+    - text: 未运行构建、测试或语法检查。
+      truncated: false
+  known_limits_truncated: false
+  submitted_at: 2026-08-14T18:24:15.858Z
+blockers: []
+verification: null
+history: []
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pending
+verification_report: null
+archived: false
+created_at: 2026-08-14T18:16:52.386Z
