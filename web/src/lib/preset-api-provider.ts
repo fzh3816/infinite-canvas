@@ -27,11 +27,11 @@ export const presetApiProviders: Record<string, PresetApiProvider> = {
         id: "nuona",
         name: "Nuona",
         channelPrefix: "nuona",
-        baseUrl: "https://api.nuona.vin",
+        baseUrl: "https://image.nuona.vin",
         pricingUrl: "/proxy/nuona-pricing",
-        setupGuideUrl: "https://aaa.com",
-        usageGuideUrl: "https://aaa.com",
-        docsUrl: "https://aaa.com",
+        setupGuideUrl: "https://z6hwfgb7yv.feishu.cn/docx/AFnhdkOR6oF3wbxnvpRcQwIonLh",
+        usageGuideUrl: "https://z6hwfgb7yv.feishu.cn/docx/AFnhdkOR6oF3wbxnvpRcQwIonLh",
+        docsUrl: "https://z6hwfgb7yv.feishu.cn/docx/AFnhdkOR6oF3wbxnvpRcQwIonLh",
     },
 };
 

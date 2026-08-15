@@ -185,7 +185,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                                     <div className="text-xs text-stone-500">每个渠道选择一个协议并拉取模型，为每个模型指定能力（生图/视频/文本/音频），并可自定义调用脚本。</div>
                                     <div className="flex gap-2">
-                                        <Button style={{ background: "linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)", borderColor: "transparent", color: "#fff", fontWeight: 500 }} onClick={() => setLingyunSetupOpen(true)}>一键配置{presetApiProvider.name} API 渠道</Button>
+                                        <Button style={{ background: "linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)", borderColor: "transparent", color: "#fff", fontWeight: 500 }} onClick={() => setLingyunSetupOpen(true)}>一键配置 {presetApiProvider.name} API 渠道</Button>
                                         <Button type="primary" icon={<Plus className="size-4" />} onClick={addChannel}>
                                             新增渠道
                                         </Button>

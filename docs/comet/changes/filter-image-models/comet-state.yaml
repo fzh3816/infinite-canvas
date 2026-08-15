@@ -2,8 +2,8 @@ schema: comet.native.v4
 name: filter-image-models
 language: zh-CN
 phase: verify
-status: active
-state_version: 4
+status: await-user
+state_version: 5
 brief: brief.md
 spec_changes:
   - capability: api-provider-config
@@ -15,7 +15,7 @@ workspace:
   target_branch: prod
   finish: null
 loop:
-  stage: verify-ready
+  stage: await-user
   goal_cycle: 1
   iteration: 1
   attempt: 1
@@ -24,113 +24,153 @@ loop:
   no_progress_count: 0
   execution_failure_count: 0
   previous_unresolved_ids: []
-  next_action: await-verifier-result
+  next_action: confirm-skill-coordinated-pass
 acceptance:
   - id: A1
     source: brief.md
     text: A1：文本密钥返回 `gpt-image-1`、`IMAGE-preview` 等名称包含 `image`
       的模型时，这些模型不会进入新建或更新的文本渠道。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 文本模型在创建渠道前执行不区分大小写的 image 过滤，gpt-image-1、IMAGE-preview 均被排除。
+      truncated: false
   - id: A2
     source: brief.md
     text: A2：文本密钥返回名称不包含 `image` 且被识别为文本能力的模型时，这些模型仍正常进入文本渠道。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 名称不含 image 且能力识别为 text 的模型仍保留并写入文本渠道。
+      truncated: false
   - id: A3
     source: brief.md
     text: A3：画图密钥获取及 Gemini、GPT 生图渠道的创建流程保持不变。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 画图密钥获取、Gemini/GPT 生图筛选及渠道创建块未因本次文本过滤调整。
+      truncated: false
   - id: A4
     source: specs/api-provider-config/spec.md
     text: 系统必须在 `web/src/lib/preset-api-provider.ts` 中维护 Lingyun 与 Nuona
       的完整配置对象。每个对象必须包含域名匹配信息、提供方标识与名称、渠道前缀、模型 API 地址、价格代理路径、配置教程地址、使用教程地址和文档地址。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Lingyun、Nuona 配置均包含规格要求的全部提供方字段。
+      truncated: false
   - id: A5
     source: specs/api-provider-config/spec.md
     text: 系统必须只在该模块中根据当前访问域名选择配置。域名包含 `nuona.vin` 时选择 Nuona，包含 `lingyunapi.com` 时选择
       Lingyun；其他域名默认选择 Lingyun。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 仅提供方配置模块读取 hostname；两个域名按配置匹配，未匹配时回退 Lingyun。
+      truncated: false
   - id: A6
     source: specs/api-provider-config/spec.md
     text: 模型 API：`https://image.lingyunapi.com`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Lingyun baseUrl 为 https://image.lingyunapi.com。
+      truncated: false
   - id: A7
     source: specs/api-provider-config/spec.md
     text: 配置教程：`https://b2wm53yf7h.apifox.cn/9200514m0`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Lingyun setupGuideUrl 符合规格。
+      truncated: false
   - id: A8
     source: specs/api-provider-config/spec.md
     text: 使用教程：`https://b2wm53yf7h.apifox.cn/9200522m0`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Lingyun usageGuideUrl 符合规格。
+      truncated: false
   - id: A9
     source: specs/api-provider-config/spec.md
     text: 文档：`https://b2wm53yf7h.apifox.cn/9200514m0`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Lingyun docsUrl 符合规格。
+      truncated: false
   - id: A10
     source: specs/api-provider-config/spec.md
     text: 价格代理：`/proxy/lingyun-pricing`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Lingyun pricingUrl 为 /proxy/lingyun-pricing。
+      truncated: false
   - id: A11
     source: specs/api-provider-config/spec.md
     text: 模型 API：`https://api.nuona.vin`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Nuona baseUrl 为 https://api.nuona.vin。
+      truncated: false
   - id: A12
     source: specs/api-provider-config/spec.md
     text: 配置教程：`https://aaa.com`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Nuona setupGuideUrl 为 https://aaa.com。
+      truncated: false
   - id: A13
     source: specs/api-provider-config/spec.md
     text: 使用教程：`https://aaa.com`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Nuona usageGuideUrl 为 https://aaa.com。
+      truncated: false
   - id: A14
     source: specs/api-provider-config/spec.md
     text: 文档：`https://aaa.com`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Nuona docsUrl 为 https://aaa.com。
+      truncated: false
   - id: A15
     source: specs/api-provider-config/spec.md
     text: 价格代理：`/proxy/nuona-pricing`
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Nuona pricingUrl 为 /proxy/nuona-pricing。
+      truncated: false
   - id: A16
     source: specs/api-provider-config/spec.md
     text: 一键渠道配置获取文本密钥对应的模型后，必须只保留能力被识别为文本且模型名称不包含 `image` 的模型。`image`
       匹配必须不区分大小写，过滤后的模型才能用于创建或更新文本渠道。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 文本模型同时要求 text 能力和小写名称不含 image，过滤发生在创建文本渠道之前。
+      truncated: false
   - id: A17
     source: specs/api-provider-config/spec.md
     text: 画图密钥对应的模型获取、Gemini 生图渠道和 GPT 生图渠道的筛选与创建流程保持不变。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Gemini、GPT 生图模型的筛选条件、能力标记和渠道创建流程保持不变。
+      truncated: false
   - id: A18
     source: specs/api-provider-config/spec.md
     text: 该过滤必须只在新增的一键渠道配置代码中实现，不得修改画布组件、画布状态、通用模型能力推断或其他画布原有源码逻辑。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 过滤仅位于新增的一键配置抽屉；未修改通用能力推断或任何画布源码。
+      truncated: false
   - id: A19
     source: specs/api-provider-config/spec.md
     text: 一键渠道配置入口与抽屉必须从所选配置读取品牌、渠道前缀、模型地址及教程地址。首页使用教程必须读取
       `usageGuideUrl`。全局文档入口必须读取 `docsUrl`。价格服务必须接收所选配置的 `pricingUrl`。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: 一键配置、教程、文档和价格消费方仍统一读取 presetApiProvider。
+      truncated: false
   - id: A20
     source: specs/api-provider-config/spec.md
     text: Nginx 必须为两个价格代理路径配置固定上游，不再根据访问域名选择容器。
-    result: pending
-    reason: null
+    result: passed
+    reason:
+      text: Nginx 两个固定价格路径分别指向既定容器，未按访问域名选择上游。
+      truncated: false
 builder_handoff:
   candidate_id: f4ba337c-2b66-4c39-b6d0-02e4be35f488
   identity_provider: skill-coordinated
@@ -198,9 +238,47 @@ builder_handoff:
       truncated: false
   known_limits_truncated: false
   submitted_at: 2026-08-14T18:24:15.858Z
-blockers: []
-verification: null
-history: []
+blockers:
+  - owner: user
+    reason:
+      text: The generic Skill bridge cannot prove an independent Verifier execution;
+        user confirmation is required before Archive.
+      truncated: false
+    acceptance_ids: []
+    resolution_action: await-user
+verification:
+  candidate_id: f4ba337c-2b66-4c39-b6d0-02e4be35f488
+  identity_provider: skill-coordinated
+  verifier_execution_ref: skill-coordinated:verifier:7ba92914-240f-4214-9eb6-6d8830ed3a4d
+  iteration: 1
+  attempt: 1
+  assurance: skill-coordinated
+  verdict: pass
+  checks: []
+  summary:
+    text: A1-A20 全部通过。文本渠道显式、不区分大小写地过滤名称含 image 的模型；其他文本模型、生图流程、画布原有逻辑及
+      Lingyun/Nuona 提供方配置均保持符合规格。
+    truncated: false
+  risks:
+    - text: 按 AGENTS.md 未运行构建、测试或语法检查。
+      truncated: false
+    - text: 未使用真实密钥请求模型接口，运行期返回结果仍需用户验证。
+      truncated: false
+    - text: Nuona 教程与文档仍使用约定的 https://aaa.com 占位地址。
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-08-14T18:31:49.532Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: A1-A20 全部通过。文本渠道显式、不区分大小写地过滤名称含 image 的模型；其他文本模型、生图流程、画布原有逻辑及
+        Lingyun/Nuona 提供方配置均保持符合规格。
+      truncated: false
+    completed_at: 2026-08-14T18:31:49.532Z
 history_overflow:
   dropped_entries: 0
   first_dropped_at: null
@@ -211,7 +289,7 @@ history_overflow:
     blocked: 0
     execution-error: 0
     recovery: 0
-verification_result: pending
-verification_report: null
+verification_result: pass
+verification_report: verification.md
 archived: false
 created_at: 2026-08-14T18:16:52.386Z

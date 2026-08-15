@@ -174,7 +174,7 @@ export function LingyunApiSetupDrawer({ open, onSetup, onClose }: { open: boolea
 
     return (
         <>
-            <Drawer open={open} width={480} title={`一键配置${presetApiProvider.name} API 渠道`} onClose={handleClose} footer={null}>
+            <Drawer open={open} width={480} title={`一键配置 ${presetApiProvider.name} API 渠道`} onClose={handleClose} footer={null}>
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-wrap gap-3">
                         {guideLinks.map((link) => (
